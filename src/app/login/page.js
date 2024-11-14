@@ -43,11 +43,7 @@ export default function Page() {
     }
 
     function handleRegister(values) {
-        if (values.password !== values.confirmPassword) {
-            alert("As senhas não correspondem!");
-            return;
-        }
-
+       
         const newUser = { id: v4(), email: values.email, password: values.password , name: values.name, username: values.username, birdthdate: values.birdthdate, cpf: values.cpf};
         registeredUsers.push(newUser);
         localStorage.setItem('user', JSON.stringify(newUser));
@@ -65,7 +61,7 @@ export default function Page() {
                 <Card.Header as="h5" className="text-center">{isRegistering ? 'Cadastro' : 'Login'}</Card.Header>
                     <Card.Body>
 
-            <Formik
+                    <Formik
     initialValues={initialValues}
     validationSchema={CadastroValidator}
     onSubmit={values => isRegistering ? handleRegister(values) : handleLogin(values)}
@@ -75,7 +71,8 @@ export default function Page() {
         handleChange,
         handleSubmit,
         setFieldValue,
-        errors
+        errors,
+        touched
     }) => (
         <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="email">
@@ -85,9 +82,12 @@ export default function Page() {
                     name="email"
                     value={values.email}
                     onChange={handleChange}
-                    isInvalid={errors.email}
+                    isInvalid={touched.email && !!errors.email}
                     placeholder="Seu Email"
                 />
+                <Form.Control.Feedback type="invalid">
+                    {errors.email}
+                </Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="password">
@@ -97,25 +97,31 @@ export default function Page() {
                     name="password"
                     value={values.password}
                     onChange={handleChange}
-                    isInvalid={errors.password}
+                    isInvalid={touched.password && !!errors.password}
                     placeholder="Sua Senha"
                 />
+                <Form.Control.Feedback type="invalid">
+                    {errors.password}
+                </Form.Control.Feedback>
             </Form.Group>
 
-            {/* Campos adicionais para registro, quando isRegistering for true */}
             {isRegistering && (
                 <>
-                    <Form.Group className="mb-3" controlId="name">
+                    <Form.Group className="mb-3" controlId="confirmPassword">
                         <Form.Label>Repita a Senha</Form.Label>
                         <Form.Control
                             type="password"
                             name="confirmPassword"
                             value={values.confirmPassword}
                             onChange={handleChange}
-                            isInvalid={errors.confirmPassword}
+                            isInvalid={touched.confirmPassword && !!errors.confirmPassword}
                             placeholder="Confirme a Senha"
                         />
+                        <Form.Control.Feedback type="invalid">
+                            {errors.confirmPassword}
+                        </Form.Control.Feedback>
                     </Form.Group>
+
                     <Form.Group className="mb-3" controlId="name">
                         <Form.Label>Nome</Form.Label>
                         <Form.Control
@@ -123,9 +129,12 @@ export default function Page() {
                             name="name"
                             value={values.name}
                             onChange={handleChange}
-                            isInvalid={errors.name}
+                            isInvalid={touched.name && !!errors.name}
                             placeholder="Seu Nome"
                         />
+                        <Form.Control.Feedback type="invalid">
+                            {errors.name}
+                        </Form.Control.Feedback>
                     </Form.Group>
 
                     <Form.Group className="mb-3" controlId="username">
@@ -135,35 +144,46 @@ export default function Page() {
                             name="username"
                             value={values.username}
                             onChange={handleChange}
-                            isInvalid={errors.username}
+                            isInvalid={touched.username && !!errors.username}
                             placeholder="Username"
                         />
+                        <Form.Control.Feedback type="invalid">
+                            {errors.username}
+                        </Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group className="mb-3" controlId="username">
+
+                    <Form.Group className="mb-3" controlId="cpf">
                         <Form.Label>CPF</Form.Label>
                         <Form.Control
                             type="text"
                             name="cpf"
                             value={values.cpf}
                             placeholder="000.000.000-00"
-                            isInvalid={errors.cpf}
-                            onChange={(value)=>{
+                            isInvalid={touched.cpf && !!errors.cpf}
+                            onChange={(value) => {
                                 setFieldValue('cpf', mask(value.target.value, '999.999.999-99'))
                             }}
                         />
+                        <Form.Control.Feedback type="invalid">
+                            {errors.cpf}
+                        </Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group className="mb-3" controlId="username">
+
+                    <Form.Group className="mb-3" controlId="birdthdate">
                         <Form.Label>Data de Nascimento</Form.Label>
                         <Form.Control
                             type="text"
                             name="birdthdate"
                             value={values.birdthdate}
-                            isInvalid={errors.birdthdate}
+                            isInvalid={touched.birdthdate && !!errors.birdthdate}
                             placeholder="00/00/0000"
-                            onChange={(value)=>{
+                            onChange={(value) => {
                                 setFieldValue('birdthdate', mask(value.target.value, '99/99/9999'))
                             }}
                         />
+                        <Form.Control.Feedback type="invalid">
+                            {errors.birdthdate}
+                        </Form.Control.Feedback>
                     </Form.Group>
                 </>
             )}
