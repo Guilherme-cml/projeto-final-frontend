@@ -30,13 +30,20 @@ export default function NavBar() {
                 <PiBooksDuotone size={30}/>
                 Clube de Livros
                 </Navbar.Brand>
-                <Nav className="">
-
-                    {/* <Nav.Link as={Link} href="/books"> 
+                <Navbar.Toggle aria-controls="basic-navbar-nav" />
+         
+                
+                     <Nav.Link as={Link} href="/books"> 
                         Livros Disponíveis
-                    </Nav.Link> */}
-                    {currentUser ? (
-                        <>
+                    </Nav.Link> 
+                
+
+                    {currentUser ? 
+                    (<>
+                        <Nav.Link className="m-2" as={Link} href="/mybooks"> 
+                        Meus Livros
+                    </Nav.Link> 
+                        <Nav className="ms-auto">
 
                             <Nav.Link as={Link} href="/user">
                                 Olá, {currentUser.username}
@@ -44,13 +51,17 @@ export default function NavBar() {
                             <Nav.Link className="text-danger" onClick={handleLogout} style={{ cursor: 'pointer' }}>
                                 Sair
                             </Nav.Link>
-                        </>
+                        
+                        </Nav>
+                    </>
+
                     ) : (
+                        <Nav className="ms-auto">
                         <Nav.Link as={Link} href="/login">
                             Login
                         </Nav.Link>
-                    )}
                 </Nav>
+                    )}
             </Container>
         </Navbar>
         <div style={{height: '100px'}}></div>
