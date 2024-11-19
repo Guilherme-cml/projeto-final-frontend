@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
 
 const CadastroValidator = Yup.object().shape({
-    name: Yup.string()  // Altere "nome" para "name"
+    name: Yup.string()  
       .min(3, 'O mínimo de caracteres é 3')
       .required('Campo obrigatório'),
     password: Yup.string()
