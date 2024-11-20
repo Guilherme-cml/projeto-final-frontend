@@ -1,72 +1,22 @@
 'use client'
-import { Button, Card, Carousel, Col, Container, Navbar, Row } from "react-bootstrap";
-import { PiBooksDuotone } from "react-icons/pi";
+import { Accordion, Button, Card, Carousel, Col, Container, Navbar, Row } from "react-bootstrap";
+import { useRouter } from "next/navigation";
 import Nav from "../components/Nav";
+import { useEffect, useState } from "react";
 
-const products = [
-  {
-    id: 1,
-    name: 'Produto 1',
-    description: 'Descrição do produto 1',
-    price: 'R$ 100,00',
-    image: '/img/a-book-1991816_640.jpg'
-  },
-  {
-    id: 2,
-    name: 'Produto 2',
-    description: 'Descrição do produto 2',
-    price: 'R$ 200,00',
-    image: '/img/a-book-3346785_640.png'
-  },
-  {
-    id: 3,
-    name: 'Produto 3',
-    description: 'Descrição do produto 3',
-    price: 'R$ 300,00',
-    image: '/img/notes-2656005_640.jpg'
-  },
-  {
-    id: 4,
-    name: 'Produto 4',
-    description: 'Descrição do produto 4',
-    price: 'R$ 400,00',
-    image: '/img/produto4.jpg'
-  },
-  {
-    id: 5,
-    name: 'Produto 5',
-    description: 'Descrição do produto 5',
-    price: 'R$ 500,00',
-    image: '/img/produto5.jpg'
-  },
-  {
-    id: 6,
-    name: 'Produto 6',
-    description: 'Descrição do produto 6',
-    price: 'R$ 600,00',
-    image: '/img/produto6.jpg'
-  }, 
-  {
-    id: 7,
-    name: 'Produto 7',
-    description: 'Descrição do produto 7',
-    price: 'R$ 700,00',
-    image: '/img/produto7.jpg'},
-  {
-    id: 8,
-    name: 'Produto 8',
-    description: 'Descrição do produto 8',
-    price: 'R$ 800,00',
-    image: '/img/produto8.jpg'
-  }
-  // Adicione mais produtos conforme necessário
-];
+
 
 
 
 
 
 export default function Home() {
+  const [events, setEvents] = useState([]);
+  const router = useRouter();
+  
+  useEffect(() => {
+    setEvents(JSON.parse(localStorage.getItem('events')) || [])
+  }, [])
   return (
     <>
     <Nav></Nav>
@@ -96,29 +46,32 @@ export default function Home() {
         </Carousel.Caption>
       </Carousel.Item>
     </Carousel>
+
     
 
-      <Container className="my-5">
+    <h1 className="text-center my-5">Eventos Disponíveis</h1>
+        <Container className="my-5">
         <Row>
-          {products.map((product) => (
-            <Col key={product.id} md={3} sm={6} className="mb-3">
+          {events.map((product) => (
+            <Col key={product.id} md={6} sm={6} className="mb-3">
               <Card className="h-100">
-                <Card.Img
-                  variant="top"
-                  src={product.image}
-                  style={{ height: '180px', objectFit: 'cover' }}
-                />
+               
                 <Card.Body>
                   <Card.Title>{product.name}</Card.Title>
                   <Card.Text>{product.description}</Card.Text>
                   <Card.Text><strong>{product.price}</strong></Card.Text>
-                  <Button variant="primary">Comprar</Button>
+                  <Button variant="primary" onClick={() => router.push(`/events`)}>Ver Eventos</Button>
                 </Card.Body>
               </Card>
             </Col>
           ))}
         </Row>
       </Container>
+        
+
+    
+
+   
    
     </>
   );

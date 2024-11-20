@@ -13,52 +13,48 @@ import {
   Alert
 } from 'react-bootstrap';
 import Nav from '@/components/Nav';
+import apiBooks from '@/services/apiBooks';
+import { v4 } from 'uuid';
 
-export default function BookDetails() {
+export default function Page() {
   const { id } = useParams();
   const [book, setBook] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
   const [message, setMessage] = useState(null);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+  const savedComments = localStorage.getItem(`comments-${id}`);
 
   useEffect(() => {
-    fetchBookDetails();
-    loadComments();
-  }, [id]);
-
-  const fetchBookDetails = async () => {
     try {
-      const response = await axios.get(
-        `https://www.googleapis.com/books/v1/volumes/${id}`
-      );
-      setBook(response.data);
+      
+      apiBooks.get(`/v1/volumes/${id}`).then(response => {
+        setBook(response.data);
+      })
     } catch (error) {
-      console.error('Error fetching book details:', error);
-    } finally {
-      setLoading(false);
+      console.error('Erro ao buscar detalhes do livro:', error);
+   
     }
-  };
-
-  const loadComments = () => {
-    // Load comments from localStorage
-    const savedComments = localStorage.getItem(`comments-${id}`);
+  
     if (savedComments) {
       setComments(JSON.parse(savedComments));
     }
-  };
+
+  }, [id]);
+
+  
 
   const addToMyBooks = () => {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) {
-      setMessage({ type: 'danger', text: 'Please login to add books to your list' });
+      setMessage({ type: 'danger', text: 'Por favor, faça login para adicionar livros a sua lista' });
       return;
     }
 
     const myBooks = JSON.parse(localStorage.getItem(`myBooks-${currentUser.id}`) || '[]');
     
     if (myBooks.some(b => b.id === book.id)) {
-      setMessage({ type: 'warning', text: 'This book is already in your list' });
+      setMessage({ type: 'warning', text: 'Este livro já está na sua lista' });
       return;
     }
 
@@ -71,10 +67,10 @@ export default function BookDetails() {
     };
 
     localStorage.setItem(`myBooks-${currentUser.id}`, JSON.stringify([...myBooks, newBook]));
-    setMessage({ type: 'success', text: 'Book added to your list successfully!' });
+    setMessage({ type: 'success', text: 'Livro adicionado a sua lista com sucesso!' });
   };
 
-  const handleCommentSubmit = (e) => {
+  function handleComment(e) {
     e.preventDefault();
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     
@@ -84,21 +80,37 @@ export default function BookDetails() {
     }
 
     const newComment = {
-      id: Date.now(),
+      id: v4(),
       text: comment,
       userId: currentUser.id,
       username: currentUser.username,
       date: new Date().toISOString()
     };
 
-    const updatedComments = [...comments, newComment];
+    const update = [...comments, newComment];
+    localStorage.setItem(`comments-${id}`, JSON.stringify(update));
+    setComments(update);
+    setComment('');
+
+  };
+  function deleteComment(commentId) {
+    const updatedComments = comments.filter(comment => comment.id !== commentId);
     localStorage.setItem(`comments-${id}`, JSON.stringify(updatedComments));
     setComments(updatedComments);
-    setComment('');
+  };
+  
+  function editComment(commentId, newText) {
+    const updatedComments = comments.map(comment => {
+      if (comment.id === commentId) {
+        return { ...comment, text: newText };
+      }
+      return comment;
+    });
+    localStorage.setItem(`comments-${id}`, JSON.stringify(updatedComments));
+    setComments(updatedComments);
+    setEditingCommentId(null);
   };
 
-  if (loading) return <Container className="py-5"><div>Loading...</div></Container>;
-  if (!book) return <Container className="py-5"><div>Book not found</div></Container>;
 
   return (
     <>
@@ -109,6 +121,9 @@ export default function BookDetails() {
           {message.text}
         </Alert>
       )}
+
+{book && (
+        <>
 
       <Row className="mb-5">
         <Col md={4}>
@@ -121,15 +136,15 @@ export default function BookDetails() {
             />
             <Card.Body>
               <Button variant="primary" className="w-100 mb-2" onClick={addToMyBooks}>
-                Add to My Books
+                Adicionar aos meus livros
               </Button>
               <Button
                 variant="outline-primary"
                 className="w-100"
                 href={book.volumeInfo.previewLink}
-                target="_blank"
+                
               >
-                Preview on Google Books
+                Ver no Google Books
               </Button>
             </Card.Body>
           </Card>
@@ -140,41 +155,53 @@ export default function BookDetails() {
           <h5 className="text-muted">
             {book.volumeInfo.authors?.join(', ')}
           </h5>
-          <p><strong>Published:</strong> {book.volumeInfo.publishedDate}</p>
-          <p><strong>Categories:</strong> {book.volumeInfo.categories?.join(', ') || 'N/A'}</p>
-          <p><strong>Description:</strong></p>
+          <p><strong>Publicado em:</strong> {book.volumeInfo.publishedDate}</p>
+          <p><strong>Categorias:</strong> {book.volumeInfo.categories?.join(', ') || 'N/A'}</p>
+          <p><strong>Descrição:</strong></p>
           <div dangerouslySetInnerHTML={{ __html: book.volumeInfo.description }} />
         </Col>
       </Row>
+      </>
+      )}
 
       <Row className="mb-5">
         <Col>
-          <h3>Comments</h3>
-          <Form onSubmit={handleCommentSubmit} className="mb-4">
+          <h3>Comentários</h3>
+          <Form onSubmit={handleComment} className="mb-4">
             <Form.Group className="mb-3">
               <Form.Control
                 as="textarea"
                 rows={3}
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                placeholder="Write your comment..."
+                placeholder="Escreva seu comentário..."
               />
             </Form.Group>
             <Button type="submit" variant="primary">
-              Add Comment
+              Adicionar Comentário
             </Button>
           </Form>
 
           <ListGroup>
             {comments.map((comment) => (
               <ListGroup.Item key={comment.id}>
-                <div className="d-flex justify-content-between">
-                  <strong>{comment.username}</strong>
-                  <small className="text-muted">
-                    {new Date(comment.date).toLocaleDateString()}
-                  </small>
-                </div>
-                <p className="mb-0">{comment.text}</p>
+                <strong>{comment.username}</strong>
+                <p>{comment.text}</p>
+                <Button 
+                  variant="link" 
+                  onClick={() => {
+                    const newText = prompt('Edit comment:', comment.text);
+                    if (newText) editComment(comment.id, newText);
+                  }}
+                >
+                  Editar
+                </Button>
+                <Button 
+                  variant="link" 
+                  onClick={() => deleteComment(comment.id)}
+                >
+                  Deletar
+                </Button>
               </ListGroup.Item>
             ))}
           </ListGroup>

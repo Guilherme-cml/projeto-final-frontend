@@ -24,47 +24,51 @@ export default function NavBar() {
 
     return (
         <>
-        <Navbar style={{ borderRadius: '15px' }} fixed="top" expand="sm" className="bg-body-tertiary m-4">
-            <Container>
-                <Navbar.Brand as={Link} href="/">
-                <PiBooksDuotone size={30}/>
-                Clube de Livros
-                </Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
-         
-                
-                     <Nav.Link as={Link} href="/books"> 
-                        Livros Disponíveis
-                    </Nav.Link> 
-                
+            <Navbar style={{ borderRadius: '15px' }} fixed="top" expand="sm" className="bg-body-tertiary m-4">
+                <Container>
+                    <Navbar.Brand as={Link} href="/">
+                        <PiBooksDuotone size={30} />
+                        Clube de Livros
+                    </Navbar.Brand>
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
-                    {currentUser ? 
-                    (<>
-                        <Nav.Link className="m-2" as={Link} href="/mybooks"> 
-                        Meus Livros
-                    </Nav.Link> 
-                        <Nav className="ms-auto">
 
-                            <Nav.Link as={Link} href="/user">
-                                Olá, {currentUser.username}
+                    <Nav.Link as={Link} href="/books">
+                    Livros Disponíveis
+                    </Nav.Link>
+                    <Nav.Link className="m-3" as={Link} href="/events">
+                    Eventos
+                    </Nav.Link>
+                    {currentUser ?
+                        (<>
+                        <Nav.Link className="" as={Link} href="/myevents">
+                    Meus Eventos
+                    </Nav.Link>
+                            <Nav.Link className="m-3" as={Link} href="/mybooks">
+                            Meus Livros
                             </Nav.Link>
-                            <Nav.Link className="text-danger" onClick={handleLogout} style={{ cursor: 'pointer' }}>
-                                Sair
-                            </Nav.Link>
-                        
-                        </Nav>
-                    </>
+                            <Nav className="ms-auto">
 
-                    ) : (
-                        <Nav className="ms-auto">
-                        <Nav.Link as={Link} href="/login">
-                            Login
-                        </Nav.Link>
-                </Nav>
-                    )}
-            </Container>
-        </Navbar>
-        <div style={{height: '100px'}}></div>
+                                <Nav.Link as={Link} href="/user">
+                                    Olá, {currentUser.username}
+                                </Nav.Link>
+                                <Nav.Link className="text-danger" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+                                    Sair
+                                </Nav.Link>
+
+                            </Nav>
+                        </>
+
+                        ) : (
+                            <Nav className="ms-auto">
+                                <Nav.Link as={Link} href="/login">
+                                    Login
+                                </Nav.Link>
+                            </Nav>
+                        )}
+                </Container>
+            </Navbar>
+            <div style={{ height: '100px' }}></div>
         </>
 
     )
